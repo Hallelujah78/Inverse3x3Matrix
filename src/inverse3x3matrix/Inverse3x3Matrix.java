@@ -12,11 +12,32 @@ import java.util.Arrays;
  */
 public class Inverse3x3Matrix {
 
+    private static int[][] transposeMatrix(int[][] matrix) {
+        // get dimensions
+        int numRows = matrix.length;
+        int numCols = matrix[0].length;
+
+        // create transposedMatrix
+        int transposedMatrix[][] = new int[numCols][numRows];
+
+        // for every row of matrix
+        for (int i = 0; i < numRows; i++) {
+            // for every col of matrix
+            for (int j = 0; j < numCols; j++) {
+                for (int k = 0; k < numRows; k++) {
+                    // use i=rowMatrix and j = colMatrix
+                    transposedMatrix[j][i] = matrix[i][j];
+                }
+            }
+        }
+        return transposedMatrix;
+    }
+
     private static int calc2x2Determinant(int[][] matrix) {
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
     }
 
-    private static void calc3x3Determinant(int[][] matrix) {
+    private static int calc3x3Determinant(int[][] matrix) {
         int numElements = matrix.length * matrix[0].length; // 9 elements in the matrix
         int sideLength = matrix.length; // 3x3 matrix
         int determinant = 0; // store the determinant sum as we calculate it
@@ -84,16 +105,16 @@ public class Inverse3x3Matrix {
                 determinant += -(calc2x2Determinant(minorMatrix) * scalar);
             }
         }
-        System.out.println("determinant of 3x3 matrix: " + determinant);
+        return determinant;
 
     }
 
-    private static void constructMinorMatrix(int[][] matrix) {
+    private static void constructCofactorMatrix(int[][] matrix) {
         int numElements = matrix.length * matrix[0].length; // 9 elements in the matrix
         int sideLength = matrix.length; // 3x3 matrix
         int determinant = 0; // store the determinant sum as we calculate it
-        int minor3x3Matrix[][] = new int[sideLength][sideLength];
-        int minor3x3MatrixIndex = 0;
+        int[][] cofactor3x3Matrix = new int[sideLength][sideLength];
+        int cofactor3x3MatrixIndex = 0;
 
         // for all elements of matrix
         for (int i = 0; i < numElements; i++) {
@@ -151,20 +172,33 @@ public class Inverse3x3Matrix {
 
             }
 
-            // we convert the 1D value of minor3x3MatrixIndex to the
+            // we convert the 1D value of cofactor3x3MatrixIndex to the
             // 2D row and column equivalent
-            int minor3x3Row = Math.floorDiv(minor3x3MatrixIndex, minor3x3Matrix.length);
-            int minor3x3Col = minor3x3MatrixIndex % minor3x3Matrix.length;
+            int minor3x3Row = Math.floorDiv(cofactor3x3MatrixIndex, cofactor3x3Matrix.length);
+            int minor3x3Col = cofactor3x3MatrixIndex % cofactor3x3Matrix.length;
 
             // calc determinant
-            determinant = calc2x2Determinant(minorMatrix) * scalar;
-            System.out.println("2x2 determinant: " + determinant);
-            // put determinant into the matrix of minors
-            minor3x3Matrix[minor3x3Row][minor3x3Col] = determinant;
-            minor3x3MatrixIndex++;
-        }
-        System.out.println("determinant of 3x3 matrix: " + Arrays.deepToString(minor3x3Matrix));
+            determinant = calc2x2Determinant(minorMatrix);
 
+            // add to matrix and apply place sign immediately
+            // i.e. this is the matrix of co-factors
+            if (cofactor3x3MatrixIndex % 2 == 0) {
+
+                cofactor3x3Matrix[minor3x3Row][minor3x3Col] = determinant;
+            } else {
+                cofactor3x3Matrix[minor3x3Row][minor3x3Col] = -1 * determinant;
+
+            }
+
+            cofactor3x3MatrixIndex++;
+        }
+        System.out.println("determinant of 3x3 matrix: " + Arrays.deepToString(cofactor3x3Matrix));
+
+        // transpose the matrix of cofactors:
+        int[][] matrixTransposed = transposeMatrix(cofactor3x3Matrix);
+    }
+
+    private static int[][] constructInverseMatrix() {
     }
 
     /**
@@ -176,12 +210,12 @@ public class Inverse3x3Matrix {
         int anotherMatrix[][] = {{2, -3, 1}, {5, -1, 2}, {3, 2, -1}};
         int yetAnotherMatrix[][] = {{5, -1, 3}, {7, 2, 4}, {6, 0, 1}};
 
-        calc3x3Determinant(anotherMatrix);
-        calc3x3Determinant(matrix);
-        calc3x3Determinant(yetAnotherMatrix);
+        int determinant = calc3x3Determinant(anotherMatrix);
+
+        System.out.println("3x3 det: " + determinant);
 
         // test constructing minor matrix
-        constructMinorMatrix(matrix);
+        constructCofactorMatrix(anotherMatrix);
     }
 
 }
