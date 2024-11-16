@@ -239,12 +239,18 @@ public class Inverse3x3Matrix {
 
         System.out.println("3x3 det: " + determinant);
 
-        // construct cofactor matrix
-        int[][] cofactorMatrix = constructCofactorMatrix(anotherMatrix);
-        // transpose the matrix of cofactors:
-        int[][] adjunctMatrix = transposeMatrix(cofactorMatrix);
-        // construct inverse matrix
-        constructInverseMatrix(determinant, adjunctMatrix);
+        if (determinant > 0 || determinant < 0) {
+            // construct cofactor matrix
+            int[][] cofactorMatrix = constructCofactorMatrix(anotherMatrix);
+            // transpose the matrix of cofactors:
+            int[][] adjunctMatrix = transposeMatrix(cofactorMatrix);
+            // construct inverse matrix
+            constructInverseMatrix(determinant, adjunctMatrix);
+
+        } else {
+            System.out.println("Because the determinant is zero, the matrix does not have an inverse.");
+        }
     }
+}
 
 }
